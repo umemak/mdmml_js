@@ -10,7 +10,7 @@ class MDMML {
 
 class Track {
     name = '';
-    mmls = [];
+    mmls:string[] = [];
     smf = [];
 }
 
@@ -62,25 +62,26 @@ function MDtoMML(md:string):MDMML{
                 }
                 const name = items[1].trim()
                 let mmls: string[] = []
-/*
-                for _, ii := range items[2 : len(items) - 1] {
-                    mmls = append(mmls, strings.Trim(ii, " "))
+                for (let ii=2;ii<items.length;ii++){
+                    mmls.push(items[ii].trim())
                 }
-                found:= false
-                for i, v := range mm.Tracks {
-                    if v.name == name {
-                        mm.Tracks[i].mmls = append(mm.Tracks[i].mmls, mmls...)
+                let found= false
+                for (let j=0;j<mm.Tracks.length;j++) {
+                    const v = mm.Tracks[j]
+                    if (v.name == name) {
+                        for (let k=0;k<mmls.length;k++){
+                            mm.Tracks[j].mmls.push(mmls[k])
+                        }
                         found = true
                         break
                     }
                 }
-                if !found {
-                    mm.Tracks = append(mm.Tracks, Track{
-                        name: name,
-                        mmls: mmls,
-                    })
+                if (!found) {
+                    let tk = new Track()
+                    tk.name=name
+                    tk.mmls=mmls
+                    mm.Tracks.push(tk)
                 }
-*/
             }
         }
     }
