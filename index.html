@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>MDMML</title>
+    <script src="./dist/main.js"></script>
+</head>
+
+<body>
+    MD:<br>
+    <textarea id="md" rows="5" cols="33"></textarea><br>
+    <input type="button" value="Convert" onclick="doConvert()" /><br>
+    SMF:<br>
+    <p id="smf"></p>
+
+    <script>
+        function doConvert() {
+            let smf = MDtoSMF(document.getElementById('md').value);
+            document.getElementById('smf').innerText = smf;
+        }
+    </script>
+</body>
+
+</html>
