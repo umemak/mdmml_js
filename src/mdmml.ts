@@ -10,7 +10,7 @@ class MDMML {
 
 class Track {
     name = '';
-    mmls:string[] = [];
+    mmls: string[] = [];
     smf = [];
 }
 
@@ -18,7 +18,7 @@ export function MDtoSMF(md: string): Uint8Array {
     return SMF(MMLtoSMF(MDtoMML(md)))
 }
 
-function MDtoMML(md:string):MDMML{
+function MDtoMML(md: string): MDMML {
     let mm = new MDMML;
 
     const lines = md.split("\n");
@@ -62,14 +62,14 @@ function MDtoMML(md:string):MDMML{
                 }
                 const name = items[1].trim()
                 let mmls: string[] = []
-                for (let ii=2;ii<items.length;ii++){
+                for (let ii = 2; ii < items.length; ii++) {
                     mmls.push(items[ii].trim())
                 }
-                let found= false
-                for (let j=0;j<mm.Tracks.length;j++) {
+                let found = false
+                for (let j = 0; j < mm.Tracks.length; j++) {
                     const v = mm.Tracks[j]
                     if (v.name == name) {
-                        for (let k=0;k<mmls.length;k++){
+                        for (let k = 0; k < mmls.length; k++) {
                             mm.Tracks[j].mmls.push(mmls[k])
                         }
                         found = true
@@ -78,8 +78,8 @@ function MDtoMML(md:string):MDMML{
                 }
                 if (!found) {
                     let tk = new Track()
-                    tk.name=name
-                    tk.mmls=mmls
+                    tk.name = name
+                    tk.mmls = mmls
                     mm.Tracks.push(tk)
                 }
             }
