@@ -14,7 +14,7 @@ class Track {
     smf = [];
 }
 
-export function MDtoSMF(md: string): Uint8Array {
+function MDtoSMF(md: string): Uint8Array {
     return SMF(MMLtoSMF(MDtoMML(md)))
 }
 
@@ -96,10 +96,12 @@ function SMF(mm: MDMML): Uint8Array {
     return new Uint8Array();
 }
 
-export function atoi(a: string, def: number): number {
+function atoi(a: string, def: number): number {
     const ret = Number(a)
     if (Number.isNaN(ret)) {
         return def
     }
     return ret
 }
+
+export {MDtoSMF, atoi}
