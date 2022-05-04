@@ -76,10 +76,41 @@ test('tempoMs: bpm140', () => {
 })
 
 test('num: 1桁', () => {
-    expect(mdmml.num('1a', 1, 10)).toBe([1, 1])
+    expect(mdmml.num('1a', 1, 10)).toStrictEqual([1, 1])
 })
 
-// { name: "1桁", args: args{ s: "1a", min: 1, max: 10 }, want: 1, want1: 1 },
-// { name: "2桁", args: args{ s: "12a", min: 1, max: 15 }, want: 12, want1: 2 },
-// { name: "min", args: args{ s: "12a", min: 20, max: 30 }, want: 20, want1: 2 },
-// { name: "max", args: args{ s: "12a", min: 1, max: 10 }, want: 10, want1: 2 },
+test('num: 2桁', () => {
+    expect(mdmml.num('12a', 1, 15)).toStrictEqual([12, 2])
+})
+
+test('num: min', () => {
+    expect(mdmml.num('12a', 20, 30)).toStrictEqual([20, 2])
+})
+
+test('num: max', () => {
+    expect(mdmml.num('12a', 1, 10)).toStrictEqual([10, 2])
+})
+
+test('expand: normal', () => {
+    expect(mdmml.expand('cde')).toBe('cde')
+})
+
+test('expand: loop', () => {
+    expect(mdmml.expand('cr[cr][rd]3rd')).toBe('crcrcrrdrdrdrd')
+})
+
+test('lenToTick: div960 len8', () => {
+    expect(mdmml.lenToTick(960, 8)).toBe(480)
+})
+
+test('lenToTick: div960 len4', () => {
+    expect(mdmml.lenToTick(960, 4)).toBe(960)
+})
+
+test('lenToTick: div480 len8', () => {
+    expect(mdmml.lenToTick(480, 8)).toBe(240)
+})
+
+test('lenToTick: div480 len4', () => {
+    expect(mdmml.lenToTick(480, 4)).toBe(480)
+})
