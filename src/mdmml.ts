@@ -19,13 +19,28 @@ class MDMML {
 class Track {
     name = '';
     mmls: string[] = [];
-    smf: ArrayBuffer;
+    smf: Uint8Array;
 
     constructor(name: string, mmls: string[], smf: Uint8Array) {
         this.name = name
         this.mmls = mmls
         this.smf = smf
     }
+}
+
+class loop {
+    pos = 0
+    count = 0
+    constructor(pos: number, count: number) {
+        this.pos = pos
+        this.count = count
+    }
+}
+
+// chode
+class note {
+    num = 0
+    vel = 0
 }
 
 export function MDtoSMF(md: string): ArrayBuffer {
@@ -128,7 +143,11 @@ function MMLtoSMF(mm: MDMML): MDMML {
 }
 
 function SMF(mm: MDMML): ArrayBuffer {
-    return new ArrayBuffer(0);
+    let smf = Uint8ArrayJoin([mm.header, mm.Conductor.smf])
+    for (let i = 0; i < mm.Tracks.length; i++) {
+        smf = Uint8ArrayJoin([smf, mm.Tracks[i].smf])
+    }
+    return smf
 }
 
 function atoi(a: string, def: number): number {
@@ -140,15 +159,51 @@ function atoi(a: string, def: number): number {
 }
 
 function expand(mml: string): string {
-    return mml
+    let res = ''
+    let loops: loop[] = []
+    mml = mml.replaceAll(' ', '')
+    mml += '   ' // インデックス超過対策
+    for (let i = 0; i < mml.length; i++) {
+        const s = mml[i]
+        if (s == ' ') {
+            break
+        }
+        if (s == '[') { // loop begin
+            loops.push(new loop(i, -1))
+        } else if (s == ']') { // loop end
+            const [v, l] = num(mml.slice(i + 1), 1, 128)
+            let c = 2
+            if (l > 0) {
+                i = i + l
+                c = v
+            }
+            const lp = loops.length - 1
+            if (loops[lp].count == -1) {
+                loops[lp].count = c
+            }
+            if (loops[lp].count > 1) {
+                loops[lp].count--
+                i = loops[lp].pos
+            } else {
+                if (lp > 0) {
+                    loops = loops.slice(0, lp - 1)
+                }
+            }
+        } else {
+            res += s
+        }
+    }
+    return res
 }
 
-function toEvents(mml: string, ch: number, div: number): ArrayBuffer {
-    return new ArrayBuffer(0);
+function toEvents(mml: string, ch: number, div: number): Uint8Array {
+    //TODO
+    return new Uint8Array();
 }
 
-function buildSMF(title: string, events: ArrayBuffer, ch: number): ArrayBuffer {
-    return new ArrayBuffer(0);
+function buildSMF(title: string, events: ArrayBuffer, ch: number): Uint8Array {
+    //TODO
+    return new Uint8Array();
 }
 
 function Uint8ArrayJoin(src: Uint8Array[]): Uint8Array {
@@ -230,8 +285,31 @@ function tempoMs(t: number): number {
     return Math.trunc(60 * 1000 * 1000 / t)
 }
 
+function num(s: string, min: number, max: number): [number, number] {
+    let ss = ''
+    for (let i = 0; i < s.length; i++) {
+        const j = s[i]
+        if (j >= '0' && j <= '9') {
+            ss += j
+        } else {
+            break
+        }
+    }
+    let n = Number(ss)
+    if (Number.isNaN(n)) {
+        return [0, 0]
+    }
+    if (n < min) {
+        n = min
+    }
+    if (n > max) {
+        n = max
+    }
+    return [n, ss.length]
+}
+
 // for Test
 export {
     MDtoMML, MMLtoSMF, SMF, atoi, expand, toEvents, buildSMF, Uint8ArrayJoin,
-    itofb, buildTitle, buildTempo, tempoMs
+    itofb, buildTitle, buildTempo, tempoMs, num
 }

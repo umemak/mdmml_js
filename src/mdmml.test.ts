@@ -63,14 +63,23 @@ test('buildTitle: empty', () => {
     expect(mdmml.buildTitle('')).toStrictEqual(new Uint8Array([0x00, 0xff, 0x03, 0x00]))
 })
 
-test('buildTempo: 120',()=>{
+test('buildTempo: 120', () => {
     expect(mdmml.buildTempo(120)).toStrictEqual(new Uint8Array([0x00, 0xff, 0x51, 0x03, 0x07, 0xa1, 0x20]))
 })
 
-test('tempoMs: bpm120',()=>{
+test('tempoMs: bpm120', () => {
     expect(mdmml.tempoMs(120)).toBe(500000)
 })
 
-test('tempoMs: bpm140',()=>{
+test('tempoMs: bpm140', () => {
     expect(mdmml.tempoMs(140)).toBe(428571)
 })
+
+test('num: 1桁', () => {
+    expect(mdmml.num('1a', 1, 10)).toBe([1, 1])
+})
+
+// { name: "1桁", args: args{ s: "1a", min: 1, max: 10 }, want: 1, want1: 1 },
+// { name: "2桁", args: args{ s: "12a", min: 1, max: 15 }, want: 12, want1: 2 },
+// { name: "min", args: args{ s: "12a", min: 20, max: 30 }, want: 20, want1: 2 },
+// { name: "max", args: args{ s: "12a", min: 1, max: 10 }, want: 10, want1: 2 },
