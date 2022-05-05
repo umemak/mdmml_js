@@ -524,7 +524,7 @@ function itob(i: number, f: number): Uint8Array {
         }
         let ret = new Uint8Array(f)
         ret.set(new Uint8Array([i >> 7 | 0x80]), f - 2)
-        ret.set(new Uint8Array([i & 0x7f]), f - 2)
+        ret.set(new Uint8Array([i & 0x7f]), f - 1)
         return ret
     }
     if (i < 128 * 128 * 128) {
@@ -534,7 +534,7 @@ function itob(i: number, f: number): Uint8Array {
         let ret = new Uint8Array(f)
         ret.set(new Uint8Array([i >> 14 | 0x80]), f - 3)
         ret.set(new Uint8Array([i >> 7 | 0x80]), f - 2)
-        ret.set(new Uint8Array([i & 0x7f]), f - 2)
+        ret.set(new Uint8Array([i & 0x7f]), f - 1)
         return ret
     }
     if (i < 128 * 128 * 128 * 128) {
@@ -545,7 +545,7 @@ function itob(i: number, f: number): Uint8Array {
         ret.set(new Uint8Array([i >> 21 | 0x80]), f - 4)
         ret.set(new Uint8Array([i >> 14 | 0x80]), f - 3)
         ret.set(new Uint8Array([i >> 7 | 0x80]), f - 2)
-        ret.set(new Uint8Array([i & 0x7f]), f - 2)
+        ret.set(new Uint8Array([i & 0x7f]), f - 1)
         return ret
     }
     return new Uint8Array()
