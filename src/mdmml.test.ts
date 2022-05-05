@@ -1,116 +1,123 @@
 import * as mdmml from "./mdmml"
 
-test('atoi: number', () => {
-    expect(mdmml.atoi("1", 2)).toBe(1)
+describe("atoi", () => {
+    const cases = [
+        { name: "number", a: "1", def: 2, want: 1 },
+        { name: "not number", a: "a", def: 2, want: 2 },
+        { name: "not number mix", a: "1a", def: 2, want: 2 },
+    ]
+    for (const { name, a, def, want } of cases) {
+        test(name, () => {
+            expect(mdmml.atoi(a, def)).toBe(want)
+        })
+    }
 })
 
-test('atoi: not number', () => {
-    expect(mdmml.atoi("a", 2)).toBe(2)
+describe("Uint8ArrayJoin", () => {
+    const cases = [
+        {
+            name: "normal",
+            src: [new Uint8Array([1, 2, 3]), new Uint8Array([4, 5, 6])],
+            want: new Uint8Array([1, 2, 3, 4, 5, 6])
+        },
+    ]
+    for (const { name, src, want } of cases) {
+        test(name, () => {
+            expect(mdmml.Uint8ArrayJoin(src)).toStrictEqual(want)
+        })
+    }
 })
 
-test('atoi: not number mix', () => {
-    expect(mdmml.atoi("1a", 2)).toBe(2)
+describe("itofb", () => {
+    const cases = [
+        { name: "i<256 f1", i: 255, f: 1, want: new Uint8Array([0xff]) },
+        { name: "i<256 f2", i: 255, f: 2, want: new Uint8Array([0x00, 0xff]) },
+        { name: "i<65536 f1", i: 65535, f: 1, want: new Uint8Array([0xff, 0xff]) },
+        { name: "i<65536 f3", i: 65535, f: 3, want: new Uint8Array([0x00, 0xff, 0xff]) },
+        { name: "i<16777216 f1", i: 16777215, f: 1, want: new Uint8Array([0xff, 0xff, 0xff]) },
+        { name: "i<16777216 f4", i: 16777215, f: 4, want: new Uint8Array([0x00, 0xff, 0xff, 0xff]) },
+        { name: "i<4294967296 f1", i: 4294967295, f: 1, want: new Uint8Array([0xff, 0xff, 0xff, 0xff]) },
+        { name: "i<4294967296 f5", i: 4294967295, f: 5, want: new Uint8Array([0x00, 0xff, 0xff, 0xff, 0xff]) },
+        { name: "i<=4294967296 f1", i: 4294967296, f: 1, want: new Uint8Array() },
+    ]
+    for (const { name, i, f, want } of cases) {
+        test(name, () => {
+            expect(mdmml.itofb(i, f)).toStrictEqual(want)
+        })
+    }
 })
 
-test('Uint8ArrayJoin: normal', () => {
-    const src1 = new Uint8Array([1, 2, 3])
-    const src2 = new Uint8Array([4, 5, 6])
-    const want = new Uint8Array([1, 2, 3, 4, 5, 6])
-    expect(mdmml.Uint8ArrayJoin([src1, src2])).toStrictEqual(want)
+describe("buildTitle", () => {
+    const cases = [
+        { name: "normal", title: "abc", want: [0x00, 0xff, 0x03, 0x03, 0x61, 0x62, 0x63] },
+        { name: "empty", title: "", want: [0x00, 0xff, 0x03, 0x00] },
+    ]
+    for (const { name, title, want } of cases) {
+        test(name, () => {
+            expect(mdmml.buildTitle(title)).toStrictEqual(new Uint8Array(want))
+        })
+    }
 })
 
-test('itofb: i<256 f1', () => {
-    expect(mdmml.itofb(255, 1)).toStrictEqual(new Uint8Array([0xff]))
+describe("buildTempo", () => {
+    const cases = [
+        { name: "120", tempo: 120, want: [0x00, 0xff, 0x51, 0x03, 0x07, 0xa1, 0x20] },
+    ]
+    for (const { name, tempo, want } of cases) {
+        test(name, () => {
+            expect(mdmml.buildTempo(tempo)).toStrictEqual(new Uint8Array(want))
+        })
+    }
 })
 
-test('itofb: i<256 f2', () => {
-    expect(mdmml.itofb(255, 2)).toStrictEqual(new Uint8Array([0x00, 0xff]))
+describe("tempoMs", () => {
+    const cases = [
+        { name: "bpm120", t: 120, want: 500000 },
+        { name: "bpm140", t: 140, want: 428571 },
+    ]
+    for (const { name, t, want } of cases) {
+        test(name, () => {
+            expect(mdmml.tempoMs(t)).toBe(want)
+        })
+    }
 })
 
-test('itofb: i<65536 f1', () => {
-    expect(mdmml.itofb(65535, 1)).toStrictEqual(new Uint8Array([0xff, 0xff]))
+describe("num", () => {
+    const cases = [
+        { name: "1桁", s: "1a", min: 1, max: 10, want: [1, 1] },
+        { name: "2桁", s: "12a", min: 1, max: 15, want: [12, 2] },
+        { name: "min", s: "12a", min: 20, max: 30, want: [20, 2] },
+        { name: "max", s: "12a", min: 1, max: 10, want: [10, 2] },
+    ]
+    for (const { name, s, min, max, want } of cases) {
+        test(name, () => {
+            expect(mdmml.num(s, min, max)).toStrictEqual(want)
+        })
+    }
 })
 
-test('itofb: i<65536 f3', () => {
-    expect(mdmml.itofb(65535, 3)).toStrictEqual(new Uint8Array([0x00, 0xff, 0xff]))
+describe("expand", () => {
+    const cases = [
+        { name: "normal", mml: "cde", want: "cde" },
+        { name: "loop", mml: "cr[cr][rd]3rd", want: "crcrcrrdrdrdrd" },
+    ]
+    for (const { name, mml, want } of cases) {
+        test(name, () => {
+            expect(mdmml.expand(mml)).toBe(want)
+        })
+    }
 })
 
-test('itofb: i<16777216 f1', () => {
-    expect(mdmml.itofb(16777215, 1)).toStrictEqual(new Uint8Array([0xff, 0xff, 0xff]))
-})
-
-test('itofb: i<16777216 f4', () => {
-    expect(mdmml.itofb(16777215, 4)).toStrictEqual(new Uint8Array([0x00, 0xff, 0xff, 0xff]))
-})
-
-test('itofb: i<4294967296 f1', () => {
-    expect(mdmml.itofb(4294967295, 1)).toStrictEqual(new Uint8Array([0xff, 0xff, 0xff, 0xff]))
-})
-
-test('itofb: i<4294967296 f5', () => {
-    expect(mdmml.itofb(4294967295, 5)).toStrictEqual(new Uint8Array([0x00, 0xff, 0xff, 0xff, 0xff]))
-})
-
-test('itofb: i<=4294967296 f1', () => {
-    expect(mdmml.itofb(4294967296, 1)).toStrictEqual(new Uint8Array())
-})
-
-test('buildTitle: normal', () => {
-    expect(mdmml.buildTitle('abc')).toStrictEqual(new Uint8Array([0x00, 0xff, 0x03, 0x03, 0x61, 0x62, 0x63]))
-})
-
-test('buildTitle: empty', () => {
-    expect(mdmml.buildTitle('')).toStrictEqual(new Uint8Array([0x00, 0xff, 0x03, 0x00]))
-})
-
-test('buildTempo: 120', () => {
-    expect(mdmml.buildTempo(120)).toStrictEqual(new Uint8Array([0x00, 0xff, 0x51, 0x03, 0x07, 0xa1, 0x20]))
-})
-
-test('tempoMs: bpm120', () => {
-    expect(mdmml.tempoMs(120)).toBe(500000)
-})
-
-test('tempoMs: bpm140', () => {
-    expect(mdmml.tempoMs(140)).toBe(428571)
-})
-
-test('num: 1桁', () => {
-    expect(mdmml.num('1a', 1, 10)).toStrictEqual([1, 1])
-})
-
-test('num: 2桁', () => {
-    expect(mdmml.num('12a', 1, 15)).toStrictEqual([12, 2])
-})
-
-test('num: min', () => {
-    expect(mdmml.num('12a', 20, 30)).toStrictEqual([20, 2])
-})
-
-test('num: max', () => {
-    expect(mdmml.num('12a', 1, 10)).toStrictEqual([10, 2])
-})
-
-test('expand: normal', () => {
-    expect(mdmml.expand('cde')).toBe('cde')
-})
-
-test('expand: loop', () => {
-    expect(mdmml.expand('cr[cr][rd]3rd')).toBe('crcrcrrdrdrdrd')
-})
-
-test('lenToTick: div960 len8', () => {
-    expect(mdmml.lenToTick(960, 8)).toBe(480)
-})
-
-test('lenToTick: div960 len4', () => {
-    expect(mdmml.lenToTick(960, 4)).toBe(960)
-})
-
-test('lenToTick: div480 len8', () => {
-    expect(mdmml.lenToTick(480, 8)).toBe(240)
-})
-
-test('lenToTick: div480 len4', () => {
-    expect(mdmml.lenToTick(480, 4)).toBe(480)
+describe("lenToTick", () => {
+    const cases = [
+        { name: "div960 len8", div: 960, len: 8, want: 480 },
+        { name: "div960 len4", div: 960, len: 4, want: 960 },
+        { name: "div480 len8", div: 480, len: 8, want: 240 },
+        { name: "div480 len4", div: 480, len: 4, want: 480 },
+    ]
+    for (const { name, div, len, want } of cases) {
+        test(name, () => {
+            expect(mdmml.lenToTick(div, len)).toBe(want)
+        })
+    }
 })

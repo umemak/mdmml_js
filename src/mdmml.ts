@@ -5,21 +5,21 @@ const EOT = new Uint8Array([0x00, 0xFF, 0x2F, 0x00])
 
 class MDMML {
     divisions = 960;
-    title = '';
+    title = "";
     tempo = 120;
     header: Uint8Array;
     Conductor: Track;
     Tracks: Track[] = [];
     constructor() {
-        this.Conductor = new Track('', [], new Uint8Array())
+        this.Conductor = new Track("", [], new Uint8Array())
         this.header = new Uint8Array()
     }
 }
 
 class Track {
-    name = '';
-    mmls: string[] = [];
-    smf: Uint8Array;
+    name: string
+    mmls: string[]
+    smf: Uint8Array
 
     constructor(name: string, mmls: string[], smf: Uint8Array) {
         this.name = name
@@ -29,8 +29,8 @@ class Track {
 }
 
 class loop {
-    pos = 0
-    count = 0
+    pos: number
+    count: number
 
     constructor(pos: number, count: number) {
         this.pos = pos
@@ -40,8 +40,8 @@ class loop {
 
 // chode
 class note {
-    num = 0
-    vel = 0
+    num: number
+    vel: number
 
     constructor(num: number, vel: number) {
         this.num = num
@@ -49,7 +49,7 @@ class note {
     }
 }
 
-export function MDtoSMF(md: string): ArrayBuffer {
+export function MDtoSMF(md: string): Uint8Array {
     return SMF(MMLtoSMF(MDtoMML(md)))
 }
 
@@ -144,11 +144,11 @@ function MMLtoSMF(mm: MDMML): MDMML {
         new Uint8Array([0x00, 0xFF, 0x58, 0x04, 0x04, 0x02, 0x18, 0x08]),   // Rhythm 4/4
         EOT
     ])
-    mm.Conductor = new Track('Conductor', [], smf)
+    mm.Conductor = new Track("Conductor", [], smf)
     return mm
 }
 
-function SMF(mm: MDMML): ArrayBuffer {
+function SMF(mm: MDMML): Uint8Array {
     let smf = Uint8ArrayJoin([mm.header, mm.Conductor.smf])
     for (let i = 0; i < mm.Tracks.length; i++) {
         smf = Uint8ArrayJoin([smf, mm.Tracks[i].smf])
@@ -165,18 +165,18 @@ function atoi(a: string, def: number): number {
 }
 
 function expand(mml: string): string {
-    let res = ''
+    let res = ""
     let loops: loop[] = []
-    mml = mml.replace(/ /g, '')
-    mml += '   ' // インデックス超過対策
+    mml = mml.replace(/ /g, "")
+    mml += "   " // インデックス超過対策
     for (let i = 0; i < mml.length; i++) {
         const s = mml[i]
-        if (s == ' ') {
+        if (s == " ") {
             break
         }
-        if (s == '[') { // loop begin
+        if (s == "[") { // loop begin
             loops.push(new loop(i, -1))
-        } else if (s == ']') { // loop end
+        } else if (s == "]") { // loop end
             const [v, l] = num(mml.slice(i + 1), 1, 128)
             let c = 2
             if (l > 0) {
@@ -208,34 +208,34 @@ function toEvents(mml: string, ch: number, div: number): Uint8Array {
     let vel = 100
     let defTick = lenToTick(div, 8)
     mml = mml.toLowerCase()
-    mml = mml.replace(/ /g, '')
-    mml = mml.replace(/#/g, '+')
-    mml += '   ' // インデックス超過対策
+    mml = mml.replace(/ /g, "")
+    mml = mml.replace(/#/g, "+")
+    mml += "   " // インデックス超過対策
     for (let i = 0; i < mml.length; i++) {
         let s = mml[i]
-        if (s == ' ') {
+        if (s == " ") {
             break
         }
-        if ((s >= 'a' && s <= 'g') || (s == 'r')) { // note
+        if ((s >= "a" && s <= "g") || (s == "r")) { // note
             let tick = defTick
-            if (mml[i + 1] == '+') {
+            if (mml[i + 1] == "+") {
                 i++
-                s += '+'
-            } else if (mml[i + 1] == '-') {
+                s += "+"
+            } else if (mml[i + 1] == "-") {
                 i++
-                s += '-'
+                s += "-"
             }
             const [v, l] = num(mml.slice(i + 1), 1, div)
             if (l > 0) {
                 i += l
                 tick = lenToTick(div, v)
             }
-            if (mml[i + 1] == '.') {
+            if (mml[i + 1] == ".") {
                 i++
                 tick = Math.trunc(tick * 1.5)
             }
             for (; ;) {
-                if (mml[i + 1] != '^') {
+                if (mml[i + 1] != "^") {
                     break
                 }
                 i++
@@ -245,7 +245,7 @@ function toEvents(mml: string, ch: number, div: number): Uint8Array {
                     i += l
                     tick2 = lenToTick(div, v)
                 }
-                if (mml[i + 1] == '.') {
+                if (mml[i + 1] == ".") {
                     i++
                     tick2 = Math.trunc(tick * 1.5)
                 }
@@ -360,19 +360,19 @@ function toEvents(mml: string, ch: number, div: number): Uint8Array {
 
 function buildSMF(title: string, events: Uint8Array, ch: number): Uint8Array {
     const body = Uint8ArrayJoin([
-        buildTitle(title),// Title
-        new Uint8Array([0x00, 0xFF, 0x20, 0x01]),// Channel
-        itob(ch, 0),// Channel
-        new Uint8Array([0x00, 0xFF, 0x21, 0x01]),// Port
-        itob(ch, 0),// Port
-        cc(0, ch, 121, 0),// CC#121(Reset)
-        cc(0, ch, 7, 100),// CC#7(Volume)
+        buildTitle(title),                          // Title
+        new Uint8Array([0x00, 0xFF, 0x20, 0x01]),   // Channel
+        itob(ch, 0),                                // Channel
+        new Uint8Array([0x00, 0xFF, 0x21, 0x01]),   // Port
+        itob(ch, 0),                                // Port
+        cc(0, ch, 121, 0),                          // CC#121(Reset)
+        cc(0, ch, 7, 100),                          // CC#7(Volume)
         events,
         EOT
     ])
     return Uint8ArrayJoin([
         MTrk,
-        itofb(body.length, 4),// Length
+        itofb(body.length, 4),  // Length
         body
     ])
 }
@@ -457,10 +457,10 @@ function tempoMs(t: number): number {
 }
 
 function num(s: string, min: number, max: number): [number, number] {
-    let ss = ''
+    let ss = ""
     for (let i = 0; i < s.length; i++) {
         const j = s[i]
-        if (j >= '0' && j <= '9') {
+        if (j >= "0" && j <= "9") {
             ss += j
         } else {
             break
@@ -484,21 +484,21 @@ function lenToTick(div: number, len: number): number {
 }
 
 function noteOnOff(ch: number, oct: number, note: string, vel: number, tick: number): Uint8Array {
-    if (note == 'r') {
+    if (note == "r") {
         // 無音を再生
         return Uint8ArrayJoin([
-            midievent(0, 0x90 + ch, 0, 0),// on
-            midievent(tick, 0x80 + ch, 0, 0)// off
+            midiEvent(0, 0x90 + ch, 0, 0),      // on
+            midiEvent(tick, 0x80 + ch, 0, 0)    // off
         ])
     }
     const n = noteNum(oct, note)
     return Uint8ArrayJoin([
-        midievent(0, 0x90 + ch, n, vel),// on
-        midievent(tick, 0x80 + ch, n, 0)// off
+        midiEvent(0, 0x90 + ch, n, vel),    // on
+        midiEvent(tick, 0x80 + ch, n, 0)    // off
     ])
 }
 
-function midievent(dt: number, ev: number, n: number, vel: number): Uint8Array {
+function midiEvent(dt: number, ev: number, n: number, vel: number): Uint8Array {
     return Uint8ArrayJoin([
         itob(dt, 0),
         itofb(ev, 1),
@@ -575,14 +575,14 @@ function notesOnOff(ch: number, notes: note[], tick: number): Uint8Array {
     let ret = new Uint8Array()
     for (let i = 0; i < notes.length; i++) {
         const n = notes[i]
-        ret = Uint8ArrayJoin([ret, midievent(0, 0x90 + ch, n.num, n.vel)]) // on
+        ret = Uint8ArrayJoin([ret, midiEvent(0, 0x90 + ch, n.num, n.vel)])  // on
     }
     for (let i = 0; i < notes.length; i++) {
         const n = notes[i]
         if (i == 0) {
-            ret = Uint8ArrayJoin([ret, midievent(tick, 0x80 + ch, n.num, 0)]) // off
+            ret = Uint8ArrayJoin([ret, midiEvent(tick, 0x80 + ch, n.num, 0)])   // off
         } else {
-            ret = Uint8ArrayJoin([ret, midievent(0, 0x80 + ch, n.num, 0)]) // off
+            ret = Uint8ArrayJoin([ret, midiEvent(0, 0x80 + ch, n.num, 0)])  // off
         }
     }
     return ret
@@ -590,8 +590,8 @@ function notesOnOff(ch: number, notes: note[], tick: number): Uint8Array {
 
 function programChange(ch: number, p: number): Uint8Array {
     return Uint8ArrayJoin([
-        cc(0, ch, 0, 0),// CC#0(MSB)
-        cc(0, ch, 32, 0),// CC#32(LSB)
+        cc(0, ch, 0, 0),    // CC#0(MSB)
+        cc(0, ch, 32, 0),   // CC#32(LSB)
         new Uint8Array([0x00]),
         itofb(0xC0 + ch, 1),
         itob(p - 1, 0)
@@ -610,6 +610,6 @@ function cc(dt: number, ch: number, num: number, val: number): Uint8Array {
 // for Test
 export {
     MDtoMML, MMLtoSMF, SMF, atoi, expand, toEvents, buildSMF, Uint8ArrayJoin,
-    itofb, buildTitle, buildTempo, tempoMs, num, lenToTick, noteOnOff, midievent,
+    itofb, buildTitle, buildTempo, tempoMs, num, lenToTick, noteOnOff, midiEvent,
     itob, noteNum, notesOnOff, programChange, cc
 }
