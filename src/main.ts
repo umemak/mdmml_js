@@ -2,4 +2,4 @@ import { MDtoSMF } from './mdmml';
 
 export { MDtoSMF };
 
-console.log(MDtoSMF("cdefg"));
+console.log(Buffer.from(MDtoSMF("cdefg")).toString("binary"));
