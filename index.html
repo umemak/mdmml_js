@@ -39,6 +39,7 @@ Title: "お湯はり完了メロディー（人形の夢と目覚め）"
 
         function doConvert() {
             const data = MDtoSMF(document.getElementById('md').value);
+            player.stop();
             player.load(new JZZ.MIDI.SMF(data));
             document.getElementById('smf').innerText = data;
         }
