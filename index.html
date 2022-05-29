@@ -8,10 +8,22 @@
     <script src="https://cdn.jsdelivr.net/npm/jzz-synth-tiny"></script>
     <script src="https://cdn.jsdelivr.net/npm/jzz-midi-smf"></script>
     <script src="https://cdn.jsdelivr.net/npm/jzz-gui-player"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/table@latest"></script><!-- Table -->
+
+    <!-- Load Editor.js's Core -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
+
     <script type="text/javascript" src="./dist/main.js"></script>
 </head>
 
 <body>
+    <div class="block"></div>
+    <div id="editorjs"></div>
+
+    <button class="save-button">Save</button>
+    <pre class="output"></pre>
+
     MD:<br>
     <textarea id="md" rows="20" cols="100">
 ---
@@ -43,6 +55,63 @@ Title: "お湯はり完了メロディー（人形の夢と目覚め）"
             player.load(new JZZ.MIDI.SMF(data));
             document.getElementById('smf').innerText = data;
         }
+    </script>
+
+    <script>
+        const editor = new EditorJS({
+            autofocus: true,
+            tools: {
+                table: {
+                    class: Table,
+                    inlineToolbar: true,
+                }
+            },
+            data: {
+                time: 1625072989362,
+                blocks: [
+                    {
+                        id: "5Pa_aEnsj9",
+                        type: "paragraph",
+                        data: {
+                            text: 'Title: "お湯はり完了メロディー（人形の夢と目覚め）"'
+                        }
+                    },
+                    {
+                        id: "XXVTfnMlcE",
+                        type: "table",
+                        data: {
+                            withHeadings: true,
+                            content: [
+                                ["name", "1", "2", "3", "4", "5"],
+                                ["A", "@11l8o4v120gf", "e4g>c<b4g>d", "c4e4r4c<b", "a4>fdc4<b4>", "c2r2"],
+                                ["B", "@11l8o3v100r4", "rgggrggg", ">rcccrccc", "rdddrerf", "rggfe4r4"],
+                                ["C", "@11l8o3v100r4", "reeerfff", "rgggrggg", "raaa>rcrd", "reedc4r4"],
+                                ["D", "@11l2o3v100r4", "cd", "ee", "fg4g4", ">c4r4r2"]
+                            ]
+                        }
+                    }
+                ],
+                version: "2.22.1"
+            }
+        });
+
+        const saveButton = document.querySelector('.save-button');
+        const output = document.querySelector('.output');
+        saveButton.addEventListener('click', function () {
+            editor.save().then((savedData) => {
+                // cPreview.show(savedData, document.getElementById("output"));
+                // console.log(savedData);
+                output.innerHTML = JSON.stringify(savedData, null, 4);
+                const md = JSONtoMD(JSON.stringify(savedData));
+                document.getElementById('md').innerText = md;
+                const data = MDtoSMF(md);
+                player.stop();
+                player.load(new JZZ.MIDI.SMF(data));
+                document.getElementById('smf').innerText = data;
+            }).catch((error) => {
+                console.error('Saving error', error);
+            });
+        });
     </script>
 </body>
 
