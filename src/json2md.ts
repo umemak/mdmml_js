@@ -1,6 +1,6 @@
 export function JSONtoMD(json: string): string {
     let res = ""
-    const js = JSON.parse(json).blocks
+    const js = JSON.parse(unescapeHtm(json)).blocks
     for (let i = 0; i < js.length; i++) {
         const e = js[i]
         if (e.type == "table") {
@@ -20,4 +20,23 @@ export function JSONtoMD(json: string): string {
         }
     }
     return res
+}
+
+function unescapeHtm(src: string): string {
+    const patterns = new Map<string, string>([
+        ['&lt;', '<'],
+        ['&gt;', '>'],
+        ['&amp;', '&'],
+        ['&quot;', '"'],
+        ['&#x27;', '\''],
+        ['&#x60;', '`'],
+    ])
+
+    return src.replace(/&(lt|gt|amp|quot|#x27|#x60);/g, function (match: string): string {
+        const ret = patterns.get(match)
+        if (ret == undefined) {
+            return ""
+        }
+        return ret
+    })
 }
