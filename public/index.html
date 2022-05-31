@@ -1,89 +1,118 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Welcome to Firebase Hosting</title>
 
-    <!-- update the version number as needed -->
-    <script defer src="/__/firebase/9.8.2/firebase-app-compat.js"></script>
-    <!-- include only the Firebase features as you need -->
-    <script defer src="/__/firebase/9.8.2/firebase-auth-compat.js"></script>
-    <script defer src="/__/firebase/9.8.2/firebase-database-compat.js"></script>
-    <script defer src="/__/firebase/9.8.2/firebase-firestore-compat.js"></script>
-    <script defer src="/__/firebase/9.8.2/firebase-functions-compat.js"></script>
-    <script defer src="/__/firebase/9.8.2/firebase-messaging-compat.js"></script>
-    <script defer src="/__/firebase/9.8.2/firebase-storage-compat.js"></script>
-    <script defer src="/__/firebase/9.8.2/firebase-analytics-compat.js"></script>
-    <script defer src="/__/firebase/9.8.2/firebase-remote-config-compat.js"></script>
-    <script defer src="/__/firebase/9.8.2/firebase-performance-compat.js"></script>
-    <!-- 
-      initialize the SDK after all desired features are loaded, set useEmulator to false
-      to avoid connecting the SDK to running emulators.
-    -->
-    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+<head>
+    <meta charset="utf-8" />
+    <title>MDMML</title>
+    <script src="https://cdn.jsdelivr.net/npm/jzz"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jzz-synth-tiny"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jzz-midi-smf"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jzz-gui-player"></script>
 
-    <style media="screen">
-      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
-      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
-      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
-      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
-      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
-      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
-      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
-      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
-      @media (max-width: 600px) {
-        body, #message { margin-top: 0; background: white; box-shadow: none; }
-        body { border-top: 16px solid #ffa100; }
-      }
-    </style>
-  </head>
-  <body>
-    <div id="message">
-      <h2>Welcome</h2>
-      <h1>Firebase Hosting Setup Complete</h1>
-      <p>You're seeing this because you've successfully setup Firebase Hosting. Now it's time to go build something extraordinary!</p>
-      <a target="_blank" href="https://firebase.google.com/docs/hosting/">Open Hosting Documentation</a>
-    </div>
-    <p id="load">Firebase SDK Loading&hellip;</p>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/table@latest"></script><!-- Table -->
+
+    <!-- Load Editor.js's Core -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
+
+    <script type="text/javascript" src="./bundle.js"></script>
+</head>
+
+<body>
+    <div class="block"></div>
+    <div id="editorjs"></div>
+
+    <button class="save-button">Save</button>
+    <pre class="output"></pre>
+
+    MD:<br>
+    <textarea id="md" rows="20" cols="100">
+---
+Title: "お湯はり完了メロディー（人形の夢と目覚め）"
+
+---
+
+- [クラシック音楽を含む音声で初めて、音商標に登録 「お風呂が沸きました」でおなじみの "お湯はり完了メロディー" | ニュースリリース | ノーリツ](https://www.noritz.co.jp/company/news/2021/20210428-004325.html)
+
+| name | 1 | 2 | 3 | 4 | 5 |
+|---|---|---|---|---|---|
+| A | @11l8o4v120gf | e4g>c<b4g>d | c4e4r4c<b | a4>fdc4<b4> | c2r2 |
+| B | @11l8o3v100r4 | rgggrggg | >rcccrccc | rdddrerf | rggfe4r4 |
+| C | @11l8o3v100r4 | reeerfff | rgggrggg | raaa>rcrd | reedc4r4 |
+| D | @11l2o3v100r4 | cd | ee | fg4g4 | >c4r4r2 |
+    </textarea><br>
+    <input type="button" value="Convert" onclick="doConvert()" /><br>
+    SMF:<br>
+    <textarea id="smf" rows="20" cols="100"></textarea>
+    <div id=player></div>
 
     <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const loadEl = document.querySelector('#load');
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-        // // The Firebase SDK is initialized and available here!
-        //
-        // firebase.auth().onAuthStateChanged(user => { });
-        // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
-        // firebase.firestore().doc('/foo/bar').get().then(() => { });
-        // firebase.functions().httpsCallable('yourFunction')().then(() => { });
-        // firebase.messaging().requestPermission().then(() => { });
-        // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
-        // firebase.analytics(); // call to activate
-        // firebase.analytics().logEvent('tutorial_completed');
-        // firebase.performance(); // call to activate
-        //
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+        JZZ.synth.Tiny.register('Web Audio');
+        const player = new JZZ.gui.Player('player');
 
-        try {
-          let app = firebase.app();
-          let features = [
-            'auth', 
-            'database', 
-            'firestore',
-            'functions',
-            'messaging', 
-            'storage', 
-            'analytics', 
-            'remoteConfig',
-            'performance',
-          ].filter(feature => typeof app[feature] === 'function');
-          loadEl.textContent = `Firebase SDK loaded with ${features.join(', ')}`;
-        } catch (e) {
-          console.error(e);
-          loadEl.textContent = 'Error loading the Firebase SDK, check the console.';
+        function doConvert() {
+            const data = MDtoSMF(document.getElementById('md').value);
+            player.stop();
+            player.load(new JZZ.MIDI.SMF(data));
+            document.getElementById('smf').innerText = data;
         }
-      });
     </script>
-  </body>
+
+    <script>
+        const editor = new EditorJS({
+            autofocus: true,
+            tools: {
+                table: {
+                    class: Table,
+                    inlineToolbar: true,
+                }
+            },
+            data: {
+                time: 1625072989362,
+                blocks: [
+                    {
+                        id: "5Pa_aEnsj9",
+                        type: "paragraph",
+                        data: {
+                            text: 'Title: "お湯はり完了メロディー（人形の夢と目覚め）"'
+                        }
+                    },
+                    {
+                        id: "XXVTfnMlcE",
+                        type: "table",
+                        data: {
+                            withHeadings: true,
+                            content: [
+                                ["name", "1", "2", "3", "4", "5"],
+                                ["A", "@11l8o4v120gf", "e4g&gt;c&lt;b4g&gt;d", "c4e4r4c&lt;b", "a4>fdc4&lt;b4&gt;", "c2r2"],
+                                ["B", "@11l8o3v100r4", "rgggrggg", "&gt;rcccrccc", "rdddrerf", "rggfe4r4"],
+                                ["C", "@11l8o3v100r4", "reeerfff", "rgggrggg", "raaa&gt;rcrd", "reedc4r4"],
+                                ["D", "@11l2o3v100r4", "cd", "ee", "fg4g4", "&gt;c4r4r2"]
+                            ]
+                        }
+                    }
+                ],
+                version: "2.22.1"
+            }
+        });
+
+        const saveButton = document.querySelector('.save-button');
+        const output = document.querySelector('.output');
+        saveButton.addEventListener('click', function () {
+            editor.save().then((savedData) => {
+                // cPreview.show(savedData, document.getElementById("output"));
+                // console.log(savedData);
+                output.innerHTML = JSON.stringify(savedData, null, 4);
+                const md = JSONtoMD(JSON.stringify(savedData));
+                document.getElementById('md').innerText = md;
+                const data = MDtoSMF(md);
+                player.stop();
+                player.load(new JZZ.MIDI.SMF(data));
+                document.getElementById('smf').innerText = data;
+            }).catch((error) => {
+                console.error('Saving error', error);
+            });
+        });
+    </script>
+</body>
+
 </html>
