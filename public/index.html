@@ -21,42 +21,12 @@
     <div id="editorjs"></div>
 
     <button class="save-button">Convert</button>
-    <!-- <pre class="output"></pre>
-
-    MD:<br>
-    <textarea id="md" rows="20" cols="100">
----
-Title: "お湯はり完了メロディー（人形の夢と目覚め）"
-
----
-
-- [クラシック音楽を含む音声で初めて、音商標に登録 「お風呂が沸きました」でおなじみの "お湯はり完了メロディー" | ニュースリリース | ノーリツ](https://www.noritz.co.jp/company/news/2021/20210428-004325.html)
-
-| name | 1 | 2 | 3 | 4 | 5 |
-|---|---|---|---|---|---|
-| A | @11l8o4v120gf | e4g>c<b4g>d | c4e4r4c<b | a4>fdc4<b4> | c2r2 |
-| B | @11l8o3v100r4 | rgggrggg | >rcccrccc | rdddrerf | rggfe4r4 |
-| C | @11l8o3v100r4 | reeerfff | rgggrggg | raaa>rcrd | reedc4r4 |
-| D | @11l2o3v100r4 | cd | ee | fg4g4 | >c4r4r2 |
-    </textarea><br>
-    <input type="button" value="Convert" onclick="doConvert()" /><br>
-    SMF:<br>
-    <textarea id="smf" rows="20" cols="100"></textarea> -->
     <div id=player></div>
 
     <script>
         JZZ.synth.Tiny.register('Web Audio');
         const player = new JZZ.gui.Player('player');
 
-        function doConvert() {
-            const data = MDtoSMF(document.getElementById('md').value);
-            player.stop();
-            player.load(new JZZ.MIDI.SMF(data));
-            document.getElementById('smf').innerText = data;
-        }
-    </script>
-
-    <script>
         const editor = new EditorJS({
             autofocus: true,
             tools: {
@@ -95,22 +65,40 @@ Title: "お湯はり完了メロディー（人形の夢と目覚め）"
         });
 
         const saveButton = document.querySelector('.save-button');
-        // const output = document.querySelector('.output');
         saveButton.addEventListener('click', function () {
             editor.save().then((savedData) => {
-                // cPreview.show(savedData, document.getElementById("output"));
-                // console.log(savedData);
-                // output.innerHTML = JSON.stringify(savedData, null, 4);
                 const md = JSONtoMD(JSON.stringify(savedData));
-                // document.getElementById('md').innerText = md;
                 const data = MDtoSMF(md);
                 player.stop();
                 player.load(new JZZ.MIDI.SMF(data));
-                // document.getElementById('smf').innerText = data;
             }).catch((error) => {
                 console.error('Saving error', error);
             });
         });
+    </script>
+
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.8.2/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.8.2/firebase-analytics.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+            apiKey: "AIzaSyBu6Ge6St9qikvjagOWFhUkz8B3ez9juiY",
+            authDomain: "mdmml-285c0.firebaseapp.com",
+            projectId: "mdmml-285c0",
+            storageBucket: "mdmml-285c0.appspot.com",
+            messagingSenderId: "945383093006",
+            appId: "1:945383093006:web:9293dc238078b85d01dd5f",
+            measurementId: "G-L23C4HMSD5"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
     </script>
 </body>
 
